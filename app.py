@@ -5,7 +5,8 @@ import pymc as pm
 import arviz as az
 import matplotlib.pyplot as plt
 st.set_page_config(page_title="BayesFX Agent", layout="wide")
-
+if "model_run" not in st.session_state:
+    st.session_state.model_run = False
 # Sidebar
 st.sidebar.header("Controls")
 currency = st.sidebar.selectbox(
@@ -13,8 +14,10 @@ currency = st.sidebar.selectbox(
     ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
 )
 days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
+
 st.sidebar.markdown("---")
 run_model_btn = st.sidebar.button("Run Analysis")
+
 st.write("Button value:", run_model_btn)
 if "model_run" not in st.session_state:
     st.session_state.model_run = False
@@ -66,14 +69,15 @@ with tab1: # Agent Decision
         return trace
 
     # Bayesian model
-    if run_model_btn:
-        st.session_state.model_run = True
+
     if st.session_state.model_run:
         with st.spinner("Running Bayesian model..."):
             trace = run_model(returns)
-    else:
-        st.info("Click 'Run Analysis' to generate results")
-        st.stop()
+
+    if run_model_btn:
+        st.session_state.model_run = True
+    if not st.session_state.model_run:
+    st.info("Click 'Run Analysis' to generate results")
 
     # Extract values
     mu_mean = trace.posterior["mu"].mean().item()
