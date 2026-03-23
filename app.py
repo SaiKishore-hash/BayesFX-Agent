@@ -86,7 +86,7 @@ with tab1: # Agent Decision
             mu_series.append(mu)
             sigma_series.append(sigma)
         return mu_series, sigma_series
-    subset_returns = returns.tail(120)
+    subset_returns = returns.tail(100)
     with st.spinner("Running time-varying Bayesian model..."):
         mu_series, sigma_series = rolling_bayesian(subset_returns, window_size)
 
