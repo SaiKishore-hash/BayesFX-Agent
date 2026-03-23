@@ -9,8 +9,8 @@ st.set_page_config(page_title="BayesFX Agent", layout="wide")
 
 # Sidebar
 st.sidebar.header("Controls")
-window_size = st.sidebar.slider("Bayesian Window Size", 20, 150, 50)
-run_rolling = st.sidebar.checkbox("Enable Time-Varying Model")
+# window_size = st.sidebar.slider("Bayesian Window Size", 20, 150, 50)
+# run_rolling = st.sidebar.checkbox("Enable Time-Varying Model")
 # Date Time Window
 start_date = st.sidebar.date_input(
     "Start Date",
@@ -84,30 +84,30 @@ with tab1: # Agent Decision
     sigma_mean = trace.posterior["sigma"].mean().item()
     nu_mean = trace.posterior["nu"].mean().item()
 
-    # Rolling Bayesian model
-    @st.cache_resource
-    def rolling_bayesian_cached(returns, window):
-        mu_series = []
-        sigma_series = []
-        step = 5
-        for i in range(window, len(returns), step):
-            window_data = returns.iloc[i-window:i]
-            trace = run_model(window_data)
-            mu = trace.posterior["mu"].mean().item()
-            sigma = trace.posterior["sigma"].mean().item()
-            mu_series.append(mu)
-            sigma_series.append(sigma)
-        return mu_series, sigma_series
-    if run_rolling:
-        subset_returns = returns.tail(min(60, len(returns)))
-        with st.spinner("Running time-varying Bayesian model..."):
-            mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
-        st.markdown("## Time-Varying Parameters")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.line_chart(mu_series)
-        with col2:
-            st.line_chart(sigma_series)
+    # # Rolling Bayesian model
+    # @st.cache_resource
+    # def rolling_bayesian_cached(returns, window):
+    #     mu_series = []
+    #     sigma_series = []
+    #     step = 5
+    #     for i in range(window, len(returns), step):
+    #         window_data = returns.iloc[i-window:i]
+    #         trace = run_model(window_data)
+    #         mu = trace.posterior["mu"].mean().item()
+    #         sigma = trace.posterior["sigma"].mean().item()
+    #         mu_series.append(mu)
+    #         sigma_series.append(sigma)
+    #     return mu_series, sigma_series
+    # if run_rolling:
+    #     subset_returns = returns.tail(min(60, len(returns)))
+    #     with st.spinner("Running time-varying Bayesian model..."):
+    #         mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
+    #     st.markdown("## Time-Varying Parameters")
+    #     col1, col2 = st.columns(2)
+    #     with col1:
+    #         st.line_chart(mu_series)
+    #     with col2:
+    #         st.line_chart(sigma_series)
 
     # Show stats
     st.subheader("Key Metrics")
