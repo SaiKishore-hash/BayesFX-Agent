@@ -118,18 +118,20 @@ with tab1: # Agent Decision
     
     # Agent decision
     st.markdown("## Agent Recommendation")
-    confidence = abs(mu_mean) / mu_std
+    confidence = abs(mu_mean) / (mu_std + 1e-6)
     st.metric("Signal Strength", f"{confidence:.2f}")
 
     if confidence < 1:
-        st.warning("Weak signal → Stay out of market")
+        st.warning("Signal dominated by noise → Avoid trading")
     elif confidence < 2:
-        st.info("Moderate signal → Trade small")
+        st.info("Weak statistical signal → Low confidence trade")
+    elif confidence < 3:
+        st.info("Moderate signal → Trade cautiously")
     else:
         if mu_mean > 0:
-            st.success("Strong signal → LONG")
+            st.success("Strong statistically significant signal → LONG")
         else:
-            st.error("Strong signal → SHORT")
+            st.error("Strong statistically significant signal → SHORT")
     
     # Market Regime
     st.markdown("## Market Regime")
