@@ -14,11 +14,8 @@ currency = st.sidebar.selectbox(
     ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
 )
 days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
-
-st.sidebar.markdown("---")
 run_model_btn = st.sidebar.button("Run Analysis")
 
-st.write("Button value:", run_model_btn)
 if "model_run" not in st.session_state:
     st.session_state.model_run = False
 
