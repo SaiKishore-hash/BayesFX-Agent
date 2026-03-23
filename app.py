@@ -76,8 +76,8 @@ with tab1: # Agent Decision
     
     # Rolling Bayesian model
     def rolling_bayesian(returns, window):
-    mu_series = []
-    sigma_series = []
+        mu_series = []
+        sigma_series = []
 
     for i in range(window, len(returns)):
         window_data = returns.iloc[i-window:i]
