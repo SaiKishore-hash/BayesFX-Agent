@@ -10,6 +10,7 @@ st.set_page_config(page_title="BayesFX Agent", layout="wide")
 # Sidebar
 st.sidebar.header("Controls")
 window_size = st.sidebar.slider("Bayesian Window Size", 20, 150, 50)
+run_rolling = st.sidebar.checkbox("Enable Time-Varying Model")
 # Date Time Window
 start_date = st.sidebar.date_input(
     "Start Date",
@@ -89,9 +90,19 @@ with tab1: # Agent Decision
             mu_series.append(mu)
             sigma_series.append(sigma)
         return mu_series, sigma_series
-    subset_returns = returns.tail(80)
-    with st.spinner("Running time-varying Bayesian model..."):
-        mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
+    if run_rolling:
+        subset_returns = returns.tail(60)
+        with st.spinner("Running time-varying Bayesian model..."):
+            mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
+        st.markdown("## Time-Varying Parameters")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.line_chart(mu_series)
+        with col2:
+            st.line_chart(sigma_series)
+    # subset_returns = returns.tail(80)
+    # with st.spinner("Running time-varying Bayesian model..."):
+    #     mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
 
     st.markdown("## Time-Varying Parameters")
     col1, col2 = st.columns(2)
