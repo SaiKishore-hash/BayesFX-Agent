@@ -63,6 +63,10 @@ with tab1: # Agent Decision
     # Bayesian model
     with st.spinner("Running Bayesian model..."):
         trace = run_model(returns)
+mu_mean = trace.posterior["mu"].mean().item()
+mu_std = trace.posterior["mu"].std().item()
+sigma_mean = trace.posterior["sigma"].mean().item()
+nu_mean = trace.posterior["nu"].mean().item()
 
     # Show stats
     st.subheader("Key Metrics")
