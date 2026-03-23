@@ -4,10 +4,23 @@ import numpy as np
 import pymc as pm
 import arviz as az
 import matplotlib.pyplot as plt
+import datetime
 st.set_page_config(page_title="BayesFX Agent", layout="wide")
 
 # Sidebar
 st.sidebar.header("Controls")
+# Date Time Window
+start_date = st.sidebar.date_input(
+    "Start Date",
+    datetime.date(2020, 1, 1)
+)
+end_date = st.sidebar.date_input(
+    "End Date",
+    datetime.date(2024, 1, 1)
+)
+if start_date >= end_date:
+    st.error("Start date must be before end date")
+    st.stop()
 currency = st.sidebar.selectbox(
     "Select Currency Pair",
     ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
@@ -17,9 +30,9 @@ days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
 # Loading data
 @st.cache_data
 def load_data(ticker):
-    return yf.download(ticker, start="2020-01-01", end="2024-01-01")
+    return yf.download(ticker, start=start, end=end)
 ticker = currency
-data = load_data(ticker)
+data = load_data(ticker, start_date, end_date)
 prices = data["Close"][ticker]
 returns = np.log(prices / prices.shift(1)).dropna().tail(days)
 
