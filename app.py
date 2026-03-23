@@ -35,10 +35,7 @@ def load_data(ticker, start, end):
     return yf.download(ticker, start=str(start), end=str(end))
 ticker = currency
 data = load_data(ticker, start_date, end_date)
-prices = data["Close"]
-if hasattr(prices, "columns"):  # multi-index case
-    prices = prices[ticker]
-returns = np.log(prices / prices.shift(1)).dropna().tail(days)
+prices = data["Close"][ticker]
 
 tab1, tab2 = st.tabs(["Agent", "How it Works"])
 
@@ -55,8 +52,7 @@ with tab1: # Agent Decision
         st.caption("Price movement")
 
     with col2:
-        window = min(20, max(5, len(returns)//5))
-        rolling_vol = returns.rolling(window).std()
+        rolling_vol = returns.rolling(20).std()
         st.line_chart(rolling_vol)
         st.caption("Rolling volatility (20 days)")
 
