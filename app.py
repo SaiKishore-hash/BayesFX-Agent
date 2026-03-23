@@ -44,7 +44,13 @@ with tab1:
         sigma = pm.HalfNormal("sigma", sigma=0.1)
         nu = pm.Exponential("nu", 1/10)
         obs = pm.StudentT("obs", mu=mu, sigma=sigma, nu=nu, observed=returns)
-        trace = pm.sample(1000, return_inferencedata=True, progressbar=False)
+        trace = pm.sample(
+        500,
+        chains=1,
+        cores=1,
+        return_inferencedata=True,
+        progressbar=False
+    )
 
     # Extract values
     mu_mean = trace.posterior["mu"].mean().item()
