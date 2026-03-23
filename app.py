@@ -34,13 +34,13 @@ with tab1: # Agent Decision
     col1, col2 = st.columns(2)
 
     with col1:
-        st.line_chart(prices.tail(200))
+        st.line_chart(prices.tail(days))
         st.caption("Price movement")
 
     with col2:
-        rolling_vol = returns.rolling(20).std()
+        rolling_vol = returns.rolling(days).std()
         st.line_chart(rolling_vol)
-        st.caption("Rolling volatility (20-day)")
+        st.caption("Rolling volatility")
 
     @st.cache_resource
     def run_model(returns):
