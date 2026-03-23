@@ -36,6 +36,7 @@ def load_data(ticker, start, end):
 ticker = currency
 data = load_data(ticker, start_date, end_date)
 prices = data["Close"][ticker]
+returns = np.log(prices / prices.shift(1)).dropna().tail(days)
 
 tab1, tab2 = st.tabs(["Agent", "How it Works"])
 
