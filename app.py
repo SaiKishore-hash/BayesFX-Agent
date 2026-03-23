@@ -119,7 +119,10 @@ with tab1: # Agent Decision
     # Agent decision
     st.markdown("## Agent Recommendation")
     confidence = abs(mu_mean) / (mu_std + 1e-6)
-    st.metric("Signal Strength", f"{confidence:.2f}")
+    st.metric("Directional Confidence", f"{confidence:.2f}")
+    st.write(""" 
+    Directional Confidence measures the strength of expected returns relative to uncertainty, effectively acting as a signal-to-noise ratio for trading decisions.
+    """)
 
     if confidence < 1:
         st.warning("Signal dominated by noise → Avoid trading")
@@ -188,7 +191,7 @@ with tab1: # Agent Decision
     
     # Risk Summary Box
     st.markdown("## Risk Summary")
-    st.write(f"""
+    st.info(f"""
     - Expected Return (μ): {mu_mean:.6f}
     - Volatility (σ): {sigma_mean:.4f}
     - Tail Risk (ν): {nu_mean:.2f}
