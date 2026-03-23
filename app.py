@@ -121,20 +121,20 @@ with tab1: # Agent Decision
     confidence = abs(mu_mean) / (mu_std + 1e-6)
     st.metric("Directional Confidence", f"{confidence:.2f}")
     st.write(""" 
-    Directional Confidence measures the strength of expected returns relative to uncertainty, effectively acting as a signal-to-noise ratio for trading decisions.
+    Directional Confidence (DC) measures the strength of expected returns relative to uncertainty, effectively acting as a signal-to-noise ratio for trading decisions.
     """)
 
     if confidence < 1:
-        st.warning("Signal dominated by noise → Avoid trading")
+        st.warning("DC dominated by noise → Avoid trading")
     elif confidence < 2:
-        st.info("Weak statistical signal → Low confidence trade")
+        st.info("Weak statistical DC → Low confidence trade")
     elif confidence < 3:
-        st.info("Moderate signal → Trade cautiously")
+        st.info("Moderate DC → Trade cautiously")
     else:
         if mu_mean > 0:
-            st.success("Strong statistically significant signal → LONG")
+            st.success("Strong statistically significant DC → LONG")
         else:
-            st.error("Strong statistically significant signal → SHORT")
+            st.error("Strong statistically significant DC → SHORT")
     
     st.markdown("## Market Regime")
     if sigma_mean > 0.006:
