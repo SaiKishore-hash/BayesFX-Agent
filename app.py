@@ -104,16 +104,16 @@ with tab1: # Agent Decision
     # with st.spinner("Running time-varying Bayesian model..."):
     #     mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
 
-    st.markdown("## Time-Varying Parameters")
-    col1, col2 = st.columns(2)
+    # st.markdown("## Time-Varying Parameters")
+    # col1, col2 = st.columns(2)
 
-    with col1:
-        st.line_chart(mu_series)
-        st.caption("Time-varying mean (μ)")
+    # with col1:
+    #     st.line_chart(mu_series)
+    #     st.caption("Time-varying mean (μ)")
 
-    with col2:
-        st.line_chart(sigma_series)
-        st.caption("Time-varying volatility (σ)")
+    # with col2:
+    #     st.line_chart(sigma_series)
+    #     st.caption("Time-varying volatility (σ)")
 
     # Bayesian model
     with st.spinner("Running Bayesian model..."):
