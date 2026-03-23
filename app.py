@@ -66,19 +66,24 @@ with tab1: # Agent Decision
             mu = pm.Normal("mu", mu=0, sigma=0.1)
             sigma = pm.HalfNormal("sigma", sigma=0.1)
             nu = pm.Exponential("nu", 1/10)
-
             obs = pm.StudentT("obs", mu=mu, sigma=sigma, nu=nu, observed=returns)
-
             trace = pm.sample(
-                200,
-                tune=200,
+                500,
                 chains=1,
                 cores=1,
                 return_inferencedata=True,
                 progressbar=False
             )
         return trace
-    
+
+    # Bayesian model
+    with st.spinner("Running Bayesian model..."):
+        trace = run_model(returns)
+    mu_mean = trace.posterior["mu"].mean().item()
+    mu_std = trace.posterior["mu"].std().item()
+    sigma_mean = trace.posterior["sigma"].mean().item()
+    nu_mean = trace.posterior["nu"].mean().item()
+
     # Rolling Bayesian model
     @st.cache_resource
     def rolling_bayesian_cached(returns, window):
@@ -103,14 +108,6 @@ with tab1: # Agent Decision
             st.line_chart(mu_series)
         with col2:
             st.line_chart(sigma_series)
-
-    # Bayesian model
-    with st.spinner("Running Bayesian model..."):
-        trace = run_model(returns)
-    mu_mean = trace.posterior["mu"].mean().item()
-    mu_std = trace.posterior["mu"].std().item()
-    sigma_mean = trace.posterior["sigma"].mean().item()
-    nu_mean = trace.posterior["nu"].mean().item()
 
     # Show stats
     st.subheader("Key Metrics")
