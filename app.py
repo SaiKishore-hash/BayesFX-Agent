@@ -8,12 +8,14 @@ st.set_page_config(page_title="BayesFX Agent", layout="wide")
 
 # Sidebar
 st.sidebar.header("Controls")
-run_model_btn = st.sidebar.button("Run Analysis")
 currency = st.sidebar.selectbox(
-"Select Currency Pair",
-["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
+    "Select Currency Pair",
+    ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
 )
 days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
+st.sidebar.markdown("---")
+run_model_btn = st.sidebar.button("Run Analysis")
+
 if "model_run" not in st.session_state:
     st.session_state.model_run = False
 
