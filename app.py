@@ -69,21 +69,21 @@ with tab1: # Agent Decision
         return trace
 
     # Bayesian model
-
+    # Button updates state FIRST
+    if run_model_btn:
+        st.session_state.model_run = True
+    # Run model only if triggered
     if st.session_state.model_run:
         with st.spinner("Running Bayesian model..."):
             trace = run_model(returns)
-
-    if run_model_btn:
-        st.session_state.model_run = True
-    if not st.session_state.model_run:
-    st.info("Click 'Run Analysis' to generate results")
-
-    # Extract values
-    mu_mean = trace.posterior["mu"].mean().item()
-    mu_std = trace.posterior["mu"].std().item()
-    sigma_mean = trace.posterior["sigma"].mean().item()
-    nu_mean = trace.posterior["nu"].mean().item()
+        # Extract values
+        mu_mean = trace.posterior["mu"].mean().item()
+        mu_std = trace.posterior["mu"].std().item()
+        sigma_mean = trace.posterior["sigma"].mean().item()
+        nu_mean = trace.posterior["nu"].mean().item()
+        # (ALL your UI below stays inside this block)
+    else:
+        st.info("Click 'Run Analysis' to generate results")
 
     # Show stats
     st.subheader("Key Metrics")
