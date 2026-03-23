@@ -14,6 +14,8 @@ currency = st.sidebar.selectbox(
 ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
 )
 days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
+if "model_run" not in st.session_state:
+    st.session_state.model_run = False
 
 # Loading data
 @st.cache_data
@@ -28,7 +30,6 @@ tab1, tab2 = st.tabs(["Agent", "How it Works"])
 
 # Separating tabs
 with tab1: # Agent Decision
-    st.set_page_config(page_title="BayesFX Agent", layout="wide")
     st.title("BayesFX Agent")
     st.caption("Probabilistic FX Decision Engine using Bayesian Inference")
 
@@ -64,6 +65,8 @@ with tab1: # Agent Decision
 
     # Bayesian model
     if run_model_btn:
+        st.session_state.model_run = True
+    if st.session_state.model_run:
         with st.spinner("Running Bayesian model..."):
             trace = run_model(returns)
     else:
