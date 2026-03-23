@@ -5,18 +5,20 @@ import pymc as pm
 import arviz as az
 import matplotlib.pyplot as plt
 st.set_page_config(page_title="BayesFX Agent", layout="wide")
+
+# Sidebar
 st.sidebar.header("Controls")
+run_model_btn = st.sidebar.button("Run Analysis")
 currency = st.sidebar.selectbox(
 "Select Currency Pair",
 ["EURUSD=X", "GBPUSD=X", "USDJPY=X", "AUDUSD=X"]
 )
-
 days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
 
+# Loading data
 @st.cache_data
 def load_data(ticker):
     return yf.download(ticker, start="2020-01-01", end="2024-01-01")
-# Load data
 ticker = currency
 data = load_data(ticker)
 prices = data["Close"][ticker]
@@ -24,7 +26,8 @@ returns = np.log(prices / prices.shift(1)).dropna().tail(days)
 
 tab1, tab2 = st.tabs(["Agent", "How it Works"])
 
-with tab1:
+# Separating tabs
+with tab1: # Agent Decision
     st.set_page_config(page_title="BayesFX Agent", layout="wide")
     st.title("BayesFX Agent")
     st.caption("Probabilistic FX Decision Engine using Bayesian Inference")
@@ -60,8 +63,12 @@ with tab1:
         return trace
 
     # Bayesian model
-    with st.spinner("Running Bayesian model..."):
-        trace = run_model(returns)
+    if run_model_btn:
+        with st.spinner("Running Bayesian model..."):
+            trace = run_model(returns)
+    else:
+        st.info("Click 'Run Analysis' to generate results")
+        st.stop()
 
     # Extract values
     mu_mean = trace.posterior["mu"].mean().item()
@@ -119,10 +126,32 @@ with tab1:
         else:
             st.error("Strong signal → SHORT")
     
+    # Market Regime
+    st.markdown("## Market Regime")
+    if sigma_mean > 0.006:
+        st.error("High Volatility Regime")
+    elif sigma_mean > 0.004:
+        st.warning("Moderate Volatility Regime")
+    else:
+        st.success("Low Volatility Regime")
+    
+    # Risk Summary Box
+    st.markdown("## Risk Summary")
+    st.write(f"""
+    - Expected Return (μ): {mu_mean:.6f}
+    - Volatility (σ): {sigma_mean:.4f}
+    - Tail Risk (ν): {nu_mean:.2f}
+
+    Interpretation:
+    - Directional edge is {"weak" if abs(mu_mean) < mu_std else "present"}
+    - Volatility is {"high" if sigma_mean > 0.005 else "normal"}
+    - Tail risk is {"elevated" if nu_mean < 5 else "moderate"}
+    """)
+    
 
 
 with tab2:
-    st.title("How BayesFX Agent Works")
+    st.title("BayesFX Agent")
 
     st.markdown("## 1. The Problem")
     st.write("""
