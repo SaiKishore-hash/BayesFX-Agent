@@ -78,19 +78,14 @@ with tab1: # Agent Decision
     def rolling_bayesian(returns, window):
         mu_series = []
         sigma_series = []
-
-    for i in range(window, len(returns)):
-        window_data = returns.iloc[i-window:i]
-
-        trace = run_model(window_data)
-
-        mu = trace.posterior["mu"].mean().item()
-        sigma = trace.posterior["sigma"].mean().item()
-
-        mu_series.append(mu)
-        sigma_series.append(sigma)
-
-    return mu_series, sigma_series
+        for i in range(window, len(returns)):
+            window_data = returns.iloc[i-window:i]
+            trace = run_model(window_data)
+            mu = trace.posterior["mu"].mean().item()
+            sigma = trace.posterior["sigma"].mean().item()
+            mu_series.append(mu)
+            sigma_series.append(sigma)
+        return mu_series, sigma_series
     subset_returns = returns.tail(120)
     with st.spinner("Running time-varying Bayesian model..."):
         mu_series, sigma_series = rolling_bayesian(subset_returns, window_size)
