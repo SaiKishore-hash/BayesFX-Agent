@@ -35,7 +35,9 @@ def load_data(ticker, start, end):
     return yf.download(ticker, start=str(start), end=str(end))
 ticker = currency
 data = load_data(ticker, start_date, end_date)
-prices = data["Close"][ticker]
+prices = data["Close"]
+if hasattr(prices, "columns"):  # multi-index case
+    prices = prices[ticker]
 returns = np.log(prices / prices.shift(1)).dropna().tail(days)
 
 tab1, tab2 = st.tabs(["Agent", "How it Works"])
@@ -53,7 +55,8 @@ with tab1: # Agent Decision
         st.caption("Price movement")
 
     with col2:
-        rolling_vol = returns.rolling(20).std()
+        window = min(20, max(5, len(returns)//5))
+        rolling_vol = returns.rolling(window).std()
         st.line_chart(rolling_vol)
         st.caption("Rolling volatility (20 days)")
 
@@ -91,7 +94,7 @@ with tab1: # Agent Decision
             sigma_series.append(sigma)
         return mu_series, sigma_series
     if run_rolling:
-        subset_returns = returns.tail(60)
+        subset_returns = returns.tail(min(60, len(returns)))
         with st.spinner("Running time-varying Bayesian model..."):
             mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
         st.markdown("## Time-Varying Parameters")
@@ -100,20 +103,6 @@ with tab1: # Agent Decision
             st.line_chart(mu_series)
         with col2:
             st.line_chart(sigma_series)
-    # subset_returns = returns.tail(80)
-    # with st.spinner("Running time-varying Bayesian model..."):
-    #     mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
-
-    # st.markdown("## Time-Varying Parameters")
-    # col1, col2 = st.columns(2)
-
-    # with col1:
-    #     st.line_chart(mu_series)
-    #     st.caption("Time-varying mean (μ)")
-
-    # with col2:
-    #     st.line_chart(sigma_series)
-    #     st.caption("Time-varying volatility (σ)")
 
     # Bayesian model
     with st.spinner("Running Bayesian model..."):
