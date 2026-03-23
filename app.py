@@ -133,14 +133,58 @@ with tab1: # Agent Decision
         else:
             st.error("Strong statistically significant signal → SHORT")
     
-    # Market Regime
     st.markdown("## Market Regime")
     if sigma_mean > 0.006:
         st.error("High Volatility Regime")
+
+        st.info("""
+        **What this means:**
+        - Large price swings are frequent
+        - Markets are unstable and uncertain
+
+        **Typical behavior:**
+        - Sudden spikes and crashes
+        - News-driven movements dominate
+
+        **Trading implication:**
+        - Reduce position size
+        - Focus on risk management
+        - Avoid overconfidence in signals
+        """)
+
     elif sigma_mean > 0.004:
         st.warning("Moderate Volatility Regime")
+
+        st.info("""
+        **What this means:**
+        - Market has noticeable movement but is not chaotic
+
+        **Typical behavior:**
+        - Trends may exist but can reverse
+        - Balanced risk and opportunity
+
+        **Trading implication:**
+        - Trade with caution
+        - Use smaller position sizes
+        - Monitor signals closely
+        """)
+
     else:
         st.success("Low Volatility Regime")
+
+        st.info("""
+        **What this means:**
+        - Market is relatively stable
+        - Small price movements dominate
+
+        **Typical behavior:**
+        - Range-bound markets
+        - Fewer extreme events
+
+        **Trading implication:**
+        - Breakout strategies may fail
+        - Consider mean-reversion strategies
+        """)
     
     # Risk Summary Box
     st.markdown("## Risk Summary")
