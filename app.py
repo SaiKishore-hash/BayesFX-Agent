@@ -66,7 +66,8 @@ with tab1: # Agent Decision
             obs = pm.StudentT("obs", mu=mu, sigma=sigma, nu=nu, observed=returns)
 
             trace = pm.sample(
-                500,
+                200,
+                tune=200,
                 chains=1,
                 cores=1,
                 return_inferencedata=True,
@@ -75,10 +76,12 @@ with tab1: # Agent Decision
         return trace
     
     # Rolling Bayesian model
-    def rolling_bayesian(returns, window):
+    @st.cache_resource
+    def rolling_bayesian_cached(returns, window):
         mu_series = []
         sigma_series = []
-        for i in range(window, len(returns)):
+        step = 5
+        for i in range(window, len(returns), step):
             window_data = returns.iloc[i-window:i]
             trace = run_model(window_data)
             mu = trace.posterior["mu"].mean().item()
@@ -86,9 +89,9 @@ with tab1: # Agent Decision
             mu_series.append(mu)
             sigma_series.append(sigma)
         return mu_series, sigma_series
-    subset_returns = returns.tail(100)
+    subset_returns = returns.tail(80)
     with st.spinner("Running time-varying Bayesian model..."):
-        mu_series, sigma_series = rolling_bayesian(subset_returns, window_size)
+        mu_series, sigma_series = rolling_bayesian_cached(subset_returns, window_size)
 
     st.markdown("## Time-Varying Parameters")
     col1, col2 = st.columns(2)
