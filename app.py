@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="BayesFX Agent", layout="wide")
 if "model_run" not in st.session_state:
     st.session_state.model_run = False
+if "last_run_params" not in st.session_state:
+    st.session_state.last_run_params = None
 # Sidebar
 st.sidebar.header("Controls")
 currency = st.sidebar.selectbox(
@@ -69,9 +71,17 @@ with tab1: # Agent Decision
     # Button updates state FIRST
     if run_model_btn:
         st.session_state.model_run = True
+        st.session_state.last_run_params = {
+            "currency": currency,
+            "days": days
+        }
     # Run model only if triggered
     if st.session_state.model_run:
         with st.spinner("Running Bayesian model..."):
+            params = st.session_state.last_run_params
+            data = load_data(params["currency"])
+            prices = data["Close"][params["currency"]]
+            returns = np.log(prices / prices.shift(1)).dropna().tail(params["days"])
             trace = run_model(returns)
         # Extract values
         mu_mean = trace.posterior["mu"].mean().item()
