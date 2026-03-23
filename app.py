@@ -4,7 +4,7 @@ import numpy as np
 import pymc as pm
 import arviz as az
 import matplotlib.pyplot as plt
-
+st.set_page_config(page_title="BayesFX Agent", layout="wide")
 st.sidebar.header("Controls")
 currency = st.sidebar.selectbox(
 "Select Currency Pair",
@@ -13,9 +13,12 @@ currency = st.sidebar.selectbox(
 
 days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
 
+@st.cache_data
+def load_data(ticker):
+    return yf.download(ticker, start="2020-01-01", end="2024-01-01")
 # Load data
 ticker = currency
-data = yf.download(ticker, start="2020-01-01", end="2024-01-01")
+data = load_data(ticker)
 prices = data["Close"][ticker]
 returns = np.log(prices / prices.shift(1)).dropna().tail(days)
 
@@ -38,19 +41,27 @@ with tab1:
         st.line_chart(rolling_vol)
         st.caption("Rolling volatility (20-day)")
 
+    @st.cache_resource
+    def run_model(returns):
+        with pm.Model() as model:
+            mu = pm.Normal("mu", mu=0, sigma=0.1)
+            sigma = pm.HalfNormal("sigma", sigma=0.1)
+            nu = pm.Exponential("nu", 1/10)
+
+            obs = pm.StudentT("obs", mu=mu, sigma=sigma, nu=nu, observed=returns)
+
+            trace = pm.sample(
+                500,
+                chains=1,
+                cores=1,
+                return_inferencedata=True,
+                progressbar=False
+            )
+        return trace
+
     # Bayesian model
-    with pm.Model() as model:
-        mu = pm.Normal("mu", mu=0, sigma=0.1)
-        sigma = pm.HalfNormal("sigma", sigma=0.1)
-        nu = pm.Exponential("nu", 1/10)
-        obs = pm.StudentT("obs", mu=mu, sigma=sigma, nu=nu, observed=returns)
-        trace = pm.sample(
-        500,
-        chains=1,
-        cores=1,
-        return_inferencedata=True,
-        progressbar=False
-    )
+    with st.spinner("Running Bayesian model..."):
+        trace = run_model(returns)
 
     # Extract values
     mu_mean = trace.posterior["mu"].mean().item()
