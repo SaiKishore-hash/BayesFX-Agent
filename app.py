@@ -29,10 +29,10 @@ days = st.sidebar.slider("Lookback Window (days)", 50, 500, 100)
 
 # Loading data
 @st.cache_data
-def load_data(ticker):
-    return yf.download(ticker, start=start, end=end)
+def load_data(ticker, start, end):
+    return yf.download(ticker, start=str(start), end=str(end))
 ticker = currency
-data = load_data(ticker, str(start_date), str(end_date))
+data = load_data(ticker, start_date, end_date)
 prices = data["Close"][ticker]
 returns = np.log(prices / prices.shift(1)).dropna().tail(days)
 
